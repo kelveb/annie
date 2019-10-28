@@ -47,9 +47,6 @@ type Data struct {
 	URL string `json:"url"`
 }
 
-// EmptyList empty Data list
-var EmptyList = make([]Data, 0)
-
 // EmptyData returns an "empty" Data object with the given URL and error
 func EmptyData(url string, err error) Data {
 	return Data{
@@ -136,6 +133,8 @@ type Aria2RPCData struct {
 // Aria2Input options for `aria2.addUri`
 // https://aria2.github.io/manual/en/html/aria2c.html#id3
 type Aria2Input struct {
+	// The file name of the downloaded file
+	Out string `json:"out"`
 	// For a simple download, only add headers
 	Header []string `json:"header"`
 }

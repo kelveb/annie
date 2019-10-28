@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/iawia002/annie/downloader"
+	"github.com/iawia002/annie/extractors"
 	"github.com/iawia002/annie/request"
 	"github.com/iawia002/annie/utils"
 )
@@ -20,16 +21,16 @@ func genAPI(action string, param string) string {
 	return fmt.Sprintf("%s%s?json=true&%s", yinyuetaiAPI, action, param)
 }
 
-// Download main download function
-func Download(url string) ([]downloader.Data, error) {
+// Extract is the main function for extracting data
+func Extract(url string) ([]downloader.Data, error) {
 	vid := utils.MatchOneOf(
 		url,
 		`https?://v.yinyuetai.com/video/(\d+)(?:\?vid=\d+)?`,
 		`https?://v.yinyuetai.com/video/h5/(\d+)(?:\?vid=\d+)?`,
 		`https?://m2.yinyuetai.com/video.html\?id=(\d+)`,
 	)
-	if vid == nil {
-		return downloader.EmptyList, errors.New("invalid url for yinyuetai")
+	if vid == nil || len(vid) < 2 {
+		return nil, errors.New("invalid url for yinyuetai")
 	}
 	params := fmt.Sprintf("videoId=%s", vid[1])
 	// generate api url
@@ -37,17 +38,19 @@ func Download(url string) ([]downloader.Data, error) {
 	var err error
 	html, err := request.Get(apiUrl, url, nil)
 	if err != nil {
-		return downloader.EmptyList, err
+		return nil, err
 	}
 	// parse yinyuetai data
 	data := yinyuetaiMvData{}
-	json.Unmarshal([]byte(html), &data)
+	if err = json.Unmarshal([]byte(html), &data); err != nil {
+		return nil, extractors.ErrURLParseFailed
+	}
 	// handle api error
 	if data.Error {
-		return downloader.EmptyList, errors.New(data.Message)
+		return nil, errors.New(data.Message)
 	}
 	if data.VideoInfo.CoreVideoInfo.Error {
-		return downloader.EmptyList, errors.New(data.VideoInfo.CoreVideoInfo.ErrorMsg)
+		return nil, errors.New(data.VideoInfo.CoreVideoInfo.ErrorMsg)
 	}
 	title := data.VideoInfo.CoreVideoInfo.VideoName
 	streams := map[string]downloader.Stream{}

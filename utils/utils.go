@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -12,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/tidwall/gjson"
 
 	"github.com/iawia002/annie/config"
 	"github.com/iawia002/annie/request"
@@ -19,6 +21,11 @@ import (
 
 // MAXLENGTH Maximum length of file name
 const MAXLENGTH = 80
+
+// GetStringFromJson get the string value from json path
+func GetStringFromJson(json, path string) string {
+	return gjson.Get(json, path).String()
+}
 
 // MatchOneOf match one of the patterns
 func MatchOneOf(text string, patterns ...string) []string {
@@ -82,14 +89,19 @@ func LimitLength(s string, length int) string {
 }
 
 // FileName Converts a string to a valid filename
-func FileName(name string) string {
+func FileName(name string, ext string) string {
 	rep := strings.NewReplacer("\n", " ", "/", " ", "|", "-", ": ", "：", ":", "：", "'", "’")
 	name = rep.Replace(name)
 	if runtime.GOOS == "windows" {
 		rep = strings.NewReplacer("\"", " ", "?", " ", "*", " ", "\\", " ", "<", " ", ">", " ")
 		name = rep.Replace(name)
 	}
-	return LimitLength(name, MAXLENGTH)
+	limitedName := LimitLength(name, MAXLENGTH)
+	if ext == "" {
+		return limitedName
+	} else {
+		return fmt.Sprintf("%s.%s", limitedName, ext)
+	}
 }
 
 // FilePath gen valid file path
@@ -100,9 +112,11 @@ func FilePath(name, ext string, escape bool) (string, error) {
 			return "", err
 		}
 	}
-	fileName := fmt.Sprintf("%s.%s", name, ext)
+	var fileName string
 	if escape {
-		fileName = FileName(fileName)
+		fileName = FileName(name, ext)
+	} else {
+		fileName = fmt.Sprintf("%s.%s", name, ext)
 	}
 	outputPath = filepath.Join(config.OutputPath, fileName)
 	return outputPath, nil
@@ -163,6 +177,10 @@ func Md5(text string) string {
 
 // M3u8URLs get all urls from m3u8 url
 func M3u8URLs(uri string) ([]string, error) {
+	if len(uri) == 0 {
+		return nil, errors.New("url is null")
+	}
+
 	html, err := request.Get(uri, "", nil)
 	if err != nil {
 		return nil, err

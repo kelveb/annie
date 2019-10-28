@@ -9,7 +9,7 @@ import (
 
 func TestDownload(t *testing.T) {
 	config.InfoOnly = true
-	config.RetryTimes = 100
+	config.RetryTimes = 10
 	tests := []struct {
 		name string
 		args test.Args
@@ -42,7 +42,7 @@ func TestDownload(t *testing.T) {
 	// The file size changes every time (caused by CDN?), so the size is not checked here
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Download(tt.args.URL)
+			Extract(tt.args.URL)
 		})
 	}
 }

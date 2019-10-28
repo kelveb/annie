@@ -93,6 +93,12 @@ $ xbps-install -S annie
 $ scoop install annie
 ```
 
+### [Chocolatey](https://chocolatey.org/) on Windows
+
+```
+$ choco install annie
+```
+
 ## Getting Started
 
 Usage:
@@ -214,9 +220,9 @@ You can use the `-start`, `-end` or `-items` option to specify the download rang
 -start
     	Playlist video to start at (default 1)
 -end
-    	Playlist video to end at (default is last)
+    	Playlist video to end at
 -items
-    	Playlist video items to download. Separated by commas like: 1,5,6
+    	Playlist video items to download. Separated by commas like: 1,5,6,8-10
 ```
 
 ### Multiple inputs
@@ -495,6 +501,8 @@ $ annie -j https://www.bilibili.com/video/av20203945
     	Cookie
   -r string
     	Use specified Referrer
+  -cs int
+    	HTTP chunk size for downloading (in MB) (default 0)
 ```
 
 #### Network:
@@ -516,7 +524,7 @@ $ annie -j https://www.bilibili.com/video/av20203945
   -end int
     	Playlist video to end at
   -items string
-    	Playlist video items to download. Separated by commas like: 1,5,6
+    	Playlist video items to download. Separated by commas like: 1,5,6,8-10
 ```
 
 #### Filesystem:
@@ -538,7 +546,11 @@ $ annie -j https://www.bilibili.com/video/av20203945
 
 ```
   -ccode string
-    	Youku ccode
+    	Youku ccode (default "0590")
+  -ckey string
+    	Youku ckey (default "7B19C0AB12633B22E7FE81271162026020570708D6CC189E4924503C49D243A0DE6CD84A766832C2C99898FC5ED31F3709BB3CDD82C96492E721BDD381735026")
+  -password string
+    	Youku password
 ```
 
 #### YouTube
@@ -576,6 +588,7 @@ pixivision | <https://www.pixivision.net> | | ✓ | | |
 YouTube | <https://www.youtube.com> | ✓ | | ✓ | |
 爱奇艺 | <https://www.iqiyi.com> | ✓ | | | |
 芒果TV | <https://www.mgtv.com> | ✓ | | | |
+糖豆广场舞 | <http://www.tangdou.com> | ✓ | | ✓ | |
 Tumblr | <https://www.tumblr.com> | ✓ | ✓ | | |
 Vimeo | <https://vimeo.com> | ✓ | | | |
 Facebook | <https://facebook.com> | ✓ | | | |
@@ -587,6 +600,10 @@ Twitter | <https://twitter.com> | ✓ | | | |
 腾讯视频 | <https://v.qq.com> | ✓ | | | |
 网易云音乐 | <https://music.163.com> | ✓ | | | |
 音悦台 | <https://yinyuetai.com> | ✓ | | | |
+极客时间 | <https://time.geekbang.org> | ✓ | | | |
+Pornhub | <https://pornhub.com> | ✓ | | | |
+XVIDEOS | <https://xvideos.com> | ✓ | | | |
+聯合新聞網 | <https://udn.com> | ✓ | | | |
 
 
 ## Known issues
@@ -597,9 +614,6 @@ Twitter | <https://twitter.com> | ✓ | | | |
 
 最好是每次下载都附带登录过的 Cookie 以避免部分 `ccode` 的问题
 
-### 爱奇艺
-
-不支持断点续传，它的响应头中没有 `Accept-Ranges`
 
 ## Contributing
 
@@ -622,6 +636,7 @@ Code with ❤️ by [iawia002](https://github.com/iawia002) and lovely [contribu
 
 * [youtube-dl](https://github.com/rg3/youtube-dl)
 * [you-get](https://github.com/soimort/you-get)
+* [ytdl](https://github.com/rylio/ytdl)
 
 
 ## License

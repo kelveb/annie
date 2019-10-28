@@ -18,18 +18,23 @@ import (
 	"github.com/iawia002/annie/extractors/douyin"
 	"github.com/iawia002/annie/extractors/douyu"
 	"github.com/iawia002/annie/extractors/facebook"
+	"github.com/iawia002/annie/extractors/geekbang"
 	"github.com/iawia002/annie/extractors/instagram"
 	"github.com/iawia002/annie/extractors/iqiyi"
 	"github.com/iawia002/annie/extractors/mgtv"
 	"github.com/iawia002/annie/extractors/miaopai"
 	"github.com/iawia002/annie/extractors/netease"
 	"github.com/iawia002/annie/extractors/pixivision"
+	"github.com/iawia002/annie/extractors/pornhub"
 	"github.com/iawia002/annie/extractors/qq"
+	"github.com/iawia002/annie/extractors/tangdou"
 	"github.com/iawia002/annie/extractors/tumblr"
 	"github.com/iawia002/annie/extractors/twitter"
+	"github.com/iawia002/annie/extractors/udn"
 	"github.com/iawia002/annie/extractors/universal"
 	"github.com/iawia002/annie/extractors/vimeo"
 	"github.com/iawia002/annie/extractors/weibo"
+	"github.com/iawia002/annie/extractors/xvideos"
 	"github.com/iawia002/annie/extractors/yinyuetai"
 	"github.com/iawia002/annie/extractors/youku"
 	"github.com/iawia002/annie/extractors/youtube"
@@ -49,6 +54,7 @@ func init() {
 	flag.StringVar(&config.OutputPath, "o", "", "Specify the output path")
 	flag.StringVar(&config.OutputName, "O", "", "Specify the output file name")
 	flag.BoolVar(&config.ExtractedData, "j", false, "Print extracted data")
+	flag.IntVar(&config.ChunkSizeMB, "cs", 0, "HTTP chunk size for downloading (in MB)")
 	flag.BoolVar(&config.UseAria2RPC, "aria2", false, "Use Aria2 RPC to download")
 	flag.StringVar(&config.Aria2Token, "aria2token", "", "Aria2 RPC Token")
 	flag.StringVar(&config.Aria2Addr, "aria2addr", "localhost:6800", "Aria2 Address")
@@ -61,13 +67,22 @@ func init() {
 	flag.IntVar(&config.PlaylistEnd, "end", 0, "Playlist video to end at")
 	flag.StringVar(
 		&config.PlaylistItems, "items", "",
-		"Playlist video items to download. Separated by commas like: 1,5,6",
+		"Playlist video items to download. Separated by commas like: 1,5,6,8-10",
 	)
 	flag.BoolVar(&config.Caption, "C", false, "Download captions")
-	flag.StringVar(&config.Ccode, "ccode", "0103010102", "Youku ccode")
 	flag.IntVar(
 		&config.RetryTimes, "retry", 10, "How many times to retry when the download failed",
 	)
+	// youku
+	flag.StringVar(&config.YoukuCcode, "ccode", "0590", "Youku ccode")
+	flag.StringVar(
+		&config.YoukuCkey,
+		"ckey",
+		"7B19C0AB12633B22E7FE81271162026020570708D6CC189E4924503C49D243A0DE6CD84A766832C2C99898FC5ED31F3709BB3CDD82C96492E721BDD381735026",
+		"Youku ckey",
+	)
+	flag.StringVar(&config.YoukuPassword, "password", "", "Youku password")
+	// youtube
 	flag.BoolVar(&config.YouTubeStream2, "ytb-stream2", false, "Use data in url_encoded_fmt_stream_map")
 }
 
@@ -78,14 +93,14 @@ func printError(url string, err error) {
 	)
 }
 
-func download(videoURL string) {
+func download(videoURL string) bool {
 	var (
 		domain string
 		err    error
 		data   []downloader.Data
 	)
 	bilibiliShortLink := utils.MatchOneOf(videoURL, `^(av|ep)\d+`)
-	if bilibiliShortLink != nil {
+	if bilibiliShortLink != nil && len(bilibiliShortLink) > 1 {
 		bilibiliURL := map[string]string{
 			"av": "https://www.bilibili.com/video/",
 			"ep": "https://www.bilibili.com/bangumi/play/",
@@ -96,69 +111,84 @@ func download(videoURL string) {
 		u, err := url.ParseRequestURI(videoURL)
 		if err != nil {
 			printError(videoURL, err)
-			return
+			return false
 		}
 		domain = utils.Domain(u.Host)
 	}
 	switch domain {
 	case "douyin", "iesdouyin":
-		data, err = douyin.Download(videoURL)
+		data, err = douyin.Extract(videoURL)
 	case "bilibili":
-		data, err = bilibili.Download(videoURL)
+		data, err = bilibili.Extract(videoURL)
 	case "bcy":
-		data, err = bcy.Download(videoURL)
+		data, err = bcy.Extract(videoURL)
 	case "pixivision":
-		data, err = pixivision.Download(videoURL)
+		data, err = pixivision.Extract(videoURL)
 	case "youku":
-		data, err = youku.Download(videoURL)
+		data, err = youku.Extract(videoURL)
 	case "youtube", "youtu": // youtu.be
-		data, err = youtube.Download(videoURL)
+		data, err = youtube.Extract(videoURL)
 	case "iqiyi":
-		data, err = iqiyi.Download(videoURL)
+		data, err = iqiyi.Extract(videoURL)
 	case "mgtv":
-		data, err = mgtv.Download(videoURL)
+		data, err = mgtv.Extract(videoURL)
+	case "tangdou":
+		data, err = tangdou.Extract(videoURL)
 	case "tumblr":
-		data, err = tumblr.Download(videoURL)
+		data, err = tumblr.Extract(videoURL)
 	case "vimeo":
-		data, err = vimeo.Download(videoURL)
+		data, err = vimeo.Extract(videoURL)
 	case "facebook":
-		data, err = facebook.Download(videoURL)
+		data, err = facebook.Extract(videoURL)
 	case "douyu":
-		data, err = douyu.Download(videoURL)
+		data, err = douyu.Extract(videoURL)
 	case "miaopai":
-		data, err = miaopai.Download(videoURL)
+		data, err = miaopai.Extract(videoURL)
 	case "163":
-		data, err = netease.Download(videoURL)
+		data, err = netease.Extract(videoURL)
 	case "weibo":
-		data, err = weibo.Download(videoURL)
+		data, err = weibo.Extract(videoURL)
 	case "instagram":
-		data, err = instagram.Download(videoURL)
+		data, err = instagram.Extract(videoURL)
 	case "twitter":
-		data, err = twitter.Download(videoURL)
+		data, err = twitter.Extract(videoURL)
 	case "qq":
-		data, err = qq.Download(videoURL)
+		data, err = qq.Extract(videoURL)
 	case "yinyuetai":
-		data, err = yinyuetai.Download(videoURL)
+		data, err = yinyuetai.Extract(videoURL)
+	case "geekbang":
+		data, err = geekbang.Extract(videoURL)
+	case "pornhub":
+		data, err = pornhub.Extract(videoURL)
+	case "xvideos":
+		data, err = xvideos.Extract(videoURL)
+	case "udn":
+		data, err = udn.Extract(videoURL)
 	default:
-		data, err = universal.Download(videoURL)
+		data, err = universal.Extract(videoURL)
 	}
 	if err != nil {
 		// if this error occurs, it means that an error occurred before actually starting to extract data
 		// (there is an error in the preparation step), and the data list is empty.
 		printError(videoURL, err)
+		return false
 	}
+	var isErr bool
 	for _, item := range data {
 		if item.Err != nil {
 			// if this error occurs, the preparation step is normal, but the data extraction is wrong.
 			// the data is an empty struct.
 			printError(item.URL, item.Err)
+			isErr = true
 			continue
 		}
-		err = downloader.Download(item, videoURL)
+		err = downloader.Download(item, videoURL, config.ChunkSizeMB)
 		if err != nil {
 			printError(item.URL, err)
+			isErr = true
 		}
 	}
+	return !isErr
 }
 
 func main() {
@@ -207,7 +237,13 @@ func main() {
 			config.Cookie = string(data)
 		}
 	}
+	var isErr bool
 	for _, videoURL := range args {
-		download(strings.TrimSpace(videoURL))
+		if !download(strings.TrimSpace(videoURL)) {
+			isErr = true
+		}
+	}
+	if isErr {
+		os.Exit(1)
 	}
 }

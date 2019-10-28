@@ -9,7 +9,7 @@ import (
 
 func TestDownload(t *testing.T) {
 	config.InfoOnly = true
-	config.RetryTimes = 100
+	config.RetryTimes = 10
 	tests := []struct {
 		name string
 		args test.Args
@@ -17,31 +17,23 @@ func TestDownload(t *testing.T) {
 		{
 			name: "normal test",
 			args: test.Args{
-				URL:   "https://www.miaopai.com/show/nPWJvdR4z2Bg1Sz3PJpNYffjpDgEiuv4msALgw__.htm",
-				Title: "情人节特辑：一个来自绝地求生的爱情故事，送给已经离开的你",
-				Size:  15756710,
-			},
-		},
-		{
-			name: "normal test 2",
-			args: test.Args{
-				URL:   "https://m.miaopai.com/show/channel/3PCuI5IZ6wdSZISmTtasYTa-l~wrVxk1yEgWRQ__",
+				URL:   "http://n.miaopai.com/media/Dqg5Pmb~I6lChdvOb-~r1BpKzzDu~MPr",
 				Title: "小学霸6点半起床学习:想赢在起跑线",
-				Size:  8783794,
+				Size:  6743958,
 			},
 		},
 		{
-			name: "normal test 3",
+			name: "normal test",
 			args: test.Args{
-				URL:   "http://n.miaopai.com/media/qVWj3dVK2oSxtW~vSq2tGeBKPE--tPSp",
+				URL:   "https://n.miaopai.com/media/qVWj3dVK2oSxtW~vSq2tGeBKPE--tPSp",
 				Title: "如果你家的猫喜欢咬人怎么办？",
-				Size:  4794459,
+				Size:  3615866,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data, err := Download(tt.args.URL)
+			data, err := Extract(tt.args.URL)
 			test.CheckError(t, err)
 			test.Check(t, tt.args, data[0])
 		})

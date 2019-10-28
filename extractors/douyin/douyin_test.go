@@ -19,13 +19,12 @@ func TestDownload(t *testing.T) {
 			args: test.Args{
 				URL:   "https://www.douyin.com/share/video/6557825773007277319/?mid=6557826301539912456",
 				Title: "跟特效师一起学跳舞，看变形金刚擎天柱怎么跳，你也来试试！@抖音小助手",
-				Size:  4927877,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data, err := Download(tt.args.URL)
+			data, err := Extract(tt.args.URL)
 			test.CheckError(t, err)
 			test.Check(t, tt.args, data[0])
 		})

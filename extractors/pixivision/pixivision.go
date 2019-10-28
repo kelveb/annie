@@ -6,15 +6,15 @@ import (
 	"github.com/iawia002/annie/request"
 )
 
-// Download main download function
-func Download(url string) ([]downloader.Data, error) {
+// Extract is the main function for extracting data
+func Extract(url string) ([]downloader.Data, error) {
 	html, err := request.Get(url, url, nil)
 	if err != nil {
-		return downloader.EmptyList, err
+		return nil, err
 	}
 	title, urls, err := parser.GetImages(url, html, "am__work__illust  ", nil)
 	if err != nil {
-		return downloader.EmptyList, err
+		return nil, err
 	}
 	streams := map[string]downloader.Stream{
 		"default": {

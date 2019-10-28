@@ -35,6 +35,15 @@ func TestYoutube(t *testing.T) {
 			},
 		},
 		{
+			name: "signature test",
+			args: test.Args{
+				URL:     "https://www.youtube.com/watch?v=ZtgzKBrU1GY",
+				Title:   "Halo Infinite - E3 2019 - Discover Hope",
+				Size:    877713473,
+				Quality: `2160p60 video/webm; codecs="vp9"`,
+			},
+		},
+		{
 			name: "normal test",
 			args: test.Args{
 				URL:     "https://www.youtube.com/watch?v=ASPku-eAZYs",
@@ -45,10 +54,10 @@ func TestYoutube(t *testing.T) {
 		{
 			name: "playlist test",
 			args: test.Args{
-				URL:     "https://www.youtube.com/watch?v=x2nKigmfzLQ&list=PLfyyPldyYFapPfxZOay2AoCCaNE1Ezd4_",
-				Title:   "【仔細看看】《羅根》黑白版-漫畫電影新高峰?! - 超粒方",
-				Size:    192310804,
-				Quality: `1080p video/webm; codecs="vp9"`,
+				URL:     "https://www.youtube.com/watch?v=Lt2pwLxJxgA&list=PLIYAO-qLriEtYm7UcXPH3SOJxgqjwRrIw",
+				Title:   "papi酱 - 你有酱婶儿的朋友吗？",
+				Size:    13549971,
+				Quality: `720p video/mp4; codecs="avc1.4d401f"`,
 			},
 			playlist: true,
 		},
@@ -56,9 +65,9 @@ func TestYoutube(t *testing.T) {
 			name: "url_encoded_fmt_stream_map test",
 			args: test.Args{
 				URL:     "https://youtu.be/DNaOZovrSVo",
-				Title:   "QNAP Success Story - Scorptec",
-				Size:    16839256,
-				Quality: `hd720 video/mp4; codecs="avc1.64001F, mp4a.40.2"`,
+				Title:   "QNAP Case Study - Scorptec",
+				Size:    25418418,
+				Quality: `1080p video/mp4; codecs="avc1.640028"`,
 			},
 		},
 		{
@@ -93,11 +102,11 @@ func TestYoutube(t *testing.T) {
 			if tt.playlist {
 				// playlist mode
 				config.Playlist = true
-				_, err = Download(tt.args.URL)
+				_, err = Extract(tt.args.URL)
 				test.CheckError(t, err)
 			} else {
 				config.Playlist = false
-				data, err = Download(tt.args.URL)
+				data, err = Extract(tt.args.URL)
 				test.CheckError(t, err)
 				test.Check(t, tt.args, data[0])
 			}

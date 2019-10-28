@@ -9,19 +9,11 @@ import (
 
 func TestDownload(t *testing.T) {
 	config.InfoOnly = true
-	config.RetryTimes = 100
+	config.RetryTimes = 10
 	tests := []struct {
 		name string
 		args test.Args
 	}{
-		{
-			name: "normal test",
-			args: test.Args{
-				URL:   "https://m.weibo.cn/2815133121/G9VBqbsWM",
-				Title: "当你超过25岁再去夜店……",
-				Size:  3112080,
-			},
-		},
 		{
 			name: "fid url test",
 			args: test.Args{
@@ -43,7 +35,7 @@ func TestDownload(t *testing.T) {
 			args: test.Args{
 				URL:   "https://weibo.com/1642500775/GjbO5ByzE",
 				Title: "让人怦然心动的小姐姐们 via@大懒糖",
-				Size:  9198410,
+				Size:  2002420,
 			},
 		},
 		{
@@ -58,7 +50,7 @@ func TestDownload(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data, err := Download(tt.args.URL)
+			data, err := Extract(tt.args.URL)
 			test.CheckError(t, err)
 			test.Check(t, tt.args, data[0])
 		})

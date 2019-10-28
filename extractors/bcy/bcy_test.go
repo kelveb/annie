@@ -17,21 +17,15 @@ func TestDownload(t *testing.T) {
 		{
 			name: "normal test",
 			args: test.Args{
-				URL:   "https://bcy.net/illust/detail/38134/2048276",
-				Title: "牛奶小姐姐，草莓味的w | 半次元-二次元爱好者社区",
-			},
-		},
-		{
-			name: "normal test",
-			args: test.Args{
-				URL:   "https://bcy.net/coser/detail/143767/2094010",
-				Title: "phx：柠檬先行预告！牧濑红莉栖 cn: 三度 | 半次元-二次元爱好者社区",
+				URL:   "https://bcy.net/item/detail/6558738153367142664",
+				Title: "cos正片 命运石之门 牧濑红莉栖 克里斯蒂娜… - 半次元 - ACG爱好者社区",
+				Size:  13035763,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data, err := Download(tt.args.URL)
+			data, err := Extract(tt.args.URL)
 			test.CheckError(t, err)
 			test.Check(t, tt.args, data[0])
 		})

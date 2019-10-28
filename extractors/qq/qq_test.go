@@ -9,7 +9,7 @@ import (
 
 func TestDownload(t *testing.T) {
 	config.InfoOnly = true
-	config.RetryTimes = 100
+	config.RetryTimes = 10
 	tests := []struct {
 		name string
 		args test.Args
@@ -23,24 +23,15 @@ func TestDownload(t *testing.T) {
 				Quality: "蓝光;(1080P)",
 			},
 		},
-		{
-			name: "movie and vid test",
-			args: test.Args{
-				URL:     "https://v.qq.com/x/cover/e5qmd3z5jr0uigk.html",
-				Title:   "赌侠（粤语版）",
-				Size:    1046910811,
-				Quality: "超清;(720P)",
-			},
-		},
-		{
-			name: "single part test",
-			args: test.Args{
-				URL:     "https://v.qq.com/iframe/player.html?vid=v0739eolv38",
-				Title:   "PGI国际邀请赛，FPP第四局，OMG强势吃鸡，全场观众高喊OMG",
-				Size:    10714773,
-				Quality: "高清;(480P)",
-			},
-		},
+		// {
+		// 	name: "movie and vid test",
+		// 	args: test.Args{
+		// 		URL:     "https://v.qq.com/x/cover/e5qmd3z5jr0uigk.html",
+		// 		Title:   "赌侠（粤语版）",
+		// 		Size:    1046910811,
+		// 		Quality: "超清;(720P)",
+		// 	},
+		// },
 		{
 			name: "fmt ID test",
 			args: test.Args{
@@ -53,7 +44,7 @@ func TestDownload(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data, err := Download(tt.args.URL)
+			data, err := Extract(tt.args.URL)
 			test.CheckError(t, err)
 			test.Check(t, tt.args, data[0])
 		})
